@@ -1,0 +1,5 @@
+{
+  "buildCommand": "pnpm --filter @e-shop/frontend build",
+  "outputDirectory": "apps/frontend/dist",
+  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
+}

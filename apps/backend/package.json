@@ -1,0 +1,30 @@
+{
+  "name": "@e-shop/backend",
+  "private": true,
+  "version": "0.1.0",
+  "main": "src/server.ts",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -b",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "typecheck": "tsc -b --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@e-shop/shared": "workspace:*",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.7",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0",
+    "tsx": "^4.7.3",
+    "typescript": "^5.4.5",
+    "vitest": "^1.5.2"
+  }
+}
