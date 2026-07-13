@@ -1,19 +1,38 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
+import ProductListingPage from './pages/ProductListingPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import CartPage from './pages/CartPage';
+import { useCartCount } from './store/cartStore';
+import './styles/catalog.css';
 
 export default function App() {
+  const cartCount = useCartCount();
+  const location = useLocation();
+
+  const navItems = [
+    { to: '/', label: 'e-shop' },
+    { to: '/products', label: 'Shop' },
+    { to: '/cart', label: `Cart${cartCount > 0 ? ` (${cartCount})` : ''}` },
+  ];
+
   return (
-    <div className="units-container">
+    <>
       <nav className="navbar">
         <ul>
-          <li className="active">
-            <Link to="/">e-shop</Link>
-          </li>
+          {navItems.map((item) => (
+            <li key={item.to} className={location.pathname === item.to ? 'active' : undefined}>
+              <Link to={item.to}>{item.label}</Link>
+            </li>
+          ))}
         </ul>
       </nav>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/products" element={<ProductListingPage />} />
+        <Route path="/products/:id" element={<ProductDetailPage />} />
+        <Route path="/cart" element={<CartPage />} />
       </Routes>
-    </div>
+    </>
   );
 }
