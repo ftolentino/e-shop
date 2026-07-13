@@ -4,7 +4,7 @@ Guidance for any Claude agent (or subagent) working in the `e-shop` repository. 
 
 ## Project Overview
 
-`e-shop` is an e-commerce web application. It is currently in the planning/scaffolding stage — no application code has been written yet.
+`e-shop` is an e-commerce web application. The core browse-to-cart flow (Home, Product Listing, Product Detail, Cart) is implemented against dummyjson.com as dev/seed catalog data; Firestore-backed catalog data, Search, Checkout, and Account are not yet built.
 
 ## Tech Stack
 
@@ -13,7 +13,7 @@ Guidance for any Claude agent (or subagent) working in the `e-shop` repository. 
 - React 18 + Vite + TypeScript
 - Routing: React Router v6
 - Server state: TanStack Query (React Query) for API data fetching/caching
-- Client/UI state: React Context, escalate to Zustand only if state complexity grows
+- Client/UI state: Zustand (confirmed — e.g. `apps/frontend/src/store/cartStore.ts` with the `persist` middleware for localStorage-backed state)
 - Styling: Ply-CSS https://www.plycss.com/
 - Testing: Vitest + React Testing Library (unit/component), Playwright (E2E)
 
@@ -138,3 +138,5 @@ pnpm lint      # lint all workspaces
 ## Decisions Log
 
 All tech stack decisions above are confirmed as of 2026-07-08: React/Vite frontend, Express-on-Vercel backend, Firestore, Firebase Auth, Stripe, ply CSS, pnpm workspaces, single Vercel project. Update this log (and the sections above) if any decision changes later.
+
+**2026-07-13** — Zustand confirmed as the client/UI state tool (superseding the earlier "Context, escalate to Zustand" guidance) for the new cart store. Core browse-to-cart flow (Home, Product Listing, Product Detail, Cart) implemented from a Claude Design wireframe pass, using dummyjson.com as a swappable dev/seed data source behind `apps/frontend/src/lib/catalog.ts` — swap that file's fetch calls for `/api/products` + Firestore when the real backend catalog is ready; no page/component changes needed.
