@@ -95,6 +95,12 @@ Rules:
 - One feature = one branch = one worktree = one PR. Don't share a worktree across unrelated tickets.
 - Agents should run `git worktree list` before creating a new one, to avoid duplicating work already in flight.
 
+**When to remove a worktree vs. keep it:**
+
+- **Dangling** (the worktree's directory was deleted from disk without running `git worktree remove` first, so `git worktree list` shows it as `prunable`) — always clean up immediately with `git worktree prune`. There's no tradeoff here: a reference to a folder that no longer exists has no value.
+- **Still active** (the feature isn't merged yet, a subagent working in it may be resumed, or a PR has open review comments) — keep the worktree. Removing it mid-iteration means re-paying the `pnpm install` cost, losing any local gitignored files (e.g. a worktree-local `.env` copied from `.env.example`), and breaking the ability to resume a subagent in that same working directory.
+- **Merged and done** (the branch is merged into `main` and no further commits are expected) — remove it, per the command above. This is the actual trigger for cleanup, not "the agent finished a single turn" — a worktree that outlives its merged branch is what creates the stale/dangling clutter this section warns against.
+
 ### Branch & commit conventions
 
 - Branches: `feature/<slug>`, `fix/<slug>`, `chore/<slug>`
