@@ -126,6 +126,31 @@ On merge to `main`:
 
 Required status checks before merge: lint, type-check, unit tests, build. All must be green.
 
+## Infrastructure Roadmap
+
+Planned infrastructure work beyond the current CI/CD baseline. Items here are not live yet — this section exists so implementation follows an agreed approach instead of getting improvised later, by whichever agent or person picks it up.
+
+### Staging environment (planned)
+
+**Decision:** decouple git branch from deploy target, rather than introducing a `develop` branch. `main` stays the single integration branch — fed by `feature/*` PRs, gated by the same required CI checks and review as today — and becomes the staging deploy target. A separate `production` branch becomes Vercel's production-domain target; promoting a release is a deliberate `main` → `production` merge (or Vercel's manual "Promote to Production" action).
+
+**Why not a `develop` branch:** git-flow's `develop` branch solves a different problem than the one we have — batching many features into scheduled releases. Adopting it here would add a second long-lived branch every feature PR has to pass through, plus a second merge that re-tests what CI already verified once, without a corresponding safety gain — Vercel already gives every PR its own preview deployment before anything reaches `main`. It would also add friction for the parallel Claude subagent workflow above, where each feature agent's PR should merge straight into `main` once its own CI run and review pass.
+
+**To implement, when ready:**
+
+1. Create a `production` branch from `main`.
+2. In Vercel project settings, change the Production Branch from `main` to `production` (Settings → Git). `main` then deploys to a stable, non-production URL — the staging environment — on every merge, same behavior as today just retargeted.
+3. Promote a staging build to production by merging (or fast-forwarding) `main` into `production`. Keep this manual at first; automate later (e.g. a manually-triggered GitHub Action) once the release cadence is predictable.
+4. Update this file's "CI/CD Pipeline" section once this is actually live — right now `main` still deploys straight to production, unchanged.
+
+### Observability / error tracking (planned, not yet scoped)
+
+Error tracking (e.g. Sentry or similar) for both `apps/frontend` and `apps/backend`, so production issues surface automatically instead of being discovered by users first. Revisit once the staging split above exists, since staging is also where this should get validated before touching production.
+
+### Security review (planned, not yet scoped)
+
+A focused security pass once there's auth/payments code to review — Firestore security rules, Stripe webhook signature verification, secret/env var handling. Scoped specifically to what this app touches, not a generic audit; see the `security-reviewer` subagent discussed for the agentic workflow.
+
 ## Local Development
 
 ```bash
@@ -140,3 +165,5 @@ pnpm lint      # lint all workspaces
 All tech stack decisions above are confirmed as of 2026-07-08: React/Vite frontend, Express-on-Vercel backend, Firestore, Firebase Auth, Stripe, ply CSS, pnpm workspaces, single Vercel project. Update this log (and the sections above) if any decision changes later.
 
 **2026-07-13** — Zustand confirmed as the client/UI state tool (superseding the earlier "Context, escalate to Zustand" guidance) for the new cart store. Core browse-to-cart flow (Home, Product Listing, Product Detail, Cart) implemented from a Claude Design wireframe pass, using dummyjson.com as a swappable dev/seed data source behind `apps/frontend/src/lib/catalog.ts` — swap that file's fetch calls for `/api/products` + Firestore when the real backend catalog is ready; no page/component changes needed.
+
+**2026-07-14** — Decided against a git-flow-style `develop` branch. Staging/production separation will instead be handled by a `production` branch that Vercel's production domain targets, while `main` (fed directly by feature PRs) becomes the staging deploy target — see "Infrastructure Roadmap" below for the reasoning and implementation steps. Not yet implemented; `main` still deploys straight to production today.
