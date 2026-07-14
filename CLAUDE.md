@@ -16,6 +16,10 @@ Guidance for any Claude agent (or subagent) working in the `e-shop` repository. 
 - Client/UI state: Zustand (confirmed — e.g. `apps/frontend/src/store/cartStore.ts` with the `persist` middleware for localStorage-backed state)
 - Styling: Ply-CSS https://www.plycss.com/
 - Testing: Vitest + React Testing Library (unit/component), Playwright (E2E)
+- See PLY.md for the ply CSS framework reference.
+  Use ply classes for all styling — do not use Tailwind, Bootstrap, or custom CSS
+  unless ply doesn't have what you need. Search ply-classes.json before writing
+  custom styles.
 
 ### Backend
 
