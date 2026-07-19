@@ -10,21 +10,24 @@ export default function App() {
   const cartCount = useCartCount();
   const location = useLocation();
 
-  const navItems = [
-    { to: '/', label: 'e-shop' },
-    { to: '/products', label: 'Shop' },
-    { to: '/cart', label: `Cart${cartCount > 0 ? ` (${cartCount})` : ''}` },
-  ];
-
   return (
     <>
-      <nav className="navbar">
+      <nav className="navbar" aria-label="Main navigation">
         <ul>
-          {navItems.map((item) => (
-            <li key={item.to} className={location.pathname === item.to ? 'active' : undefined}>
-              <Link to={item.to}>{item.label}</Link>
-            </li>
-          ))}
+          <li className={location.pathname === '/' ? 'active' : undefined}>
+            <Link to="/" className="nav-brand">
+              e-shop
+            </Link>
+          </li>
+          <li className={location.pathname.startsWith('/products') ? 'active' : undefined}>
+            <Link to="/products">Shop</Link>
+          </li>
+          <li className={location.pathname === '/cart' ? 'active' : undefined}>
+            <Link to="/cart">
+              Cart
+              {cartCount > 0 && <span className="badge margin-left-xs">{cartCount}</span>}
+            </Link>
+          </li>
         </ul>
       </nav>
       <Routes>
