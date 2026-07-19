@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { useCategories, useProductList } from '../hooks/useCatalog';
 import { PRODUCT_PAGE_SIZE, type ProductSort } from '../lib/catalog';
@@ -11,6 +11,13 @@ const SORT_OPTIONS: { value: ProductSort | ''; label: string }[] = [
   { value: 'newest', label: 'Newest' },
 ];
 
+/** Pages to show in the pagination strip: a window of 5 around the current page. */
+function pageWindow(page: number, pageCount: number): number[] {
+  const start = Math.max(1, Math.min(page - 2, pageCount - 4));
+  const end = Math.min(pageCount, start + 4);
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}
+
 export default function ProductListingPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get('category') ?? undefined;
@@ -20,7 +27,7 @@ export default function ProductListingPage() {
   const categories = useCategories();
   const listing = useProductList({ category, sort, page });
 
-  function updateParams(next: Record<string, string | undefined>) {
+  function paramsWith(next: Record<string, string | undefined>): URLSearchParams {
     const params = new URLSearchParams(searchParams);
     Object.entries(next).forEach(([key, value]) => {
       if (value) {
@@ -32,41 +39,28 @@ export default function ProductListingPage() {
     if (!('page' in next)) {
       params.delete('page');
     }
-    setSearchParams(params);
+    return params;
   }
 
   const total = listing.data?.total ?? 0;
-  const hasNextPage = page * PRODUCT_PAGE_SIZE < total;
+  const pageCount = Math.max(1, Math.ceil(total / PRODUCT_PAGE_SIZE));
 
   return (
     <main className="units-container">
       <div className="units-row">
-        <aside className="unit-25 tablet-unit-100 filter-rail">
-          <h2>Filters</h2>
-          <nav className="navbar-vertical" aria-label="Category filter">
+        <aside className="unit-25 tablet-unit-100">
+          <h2 className="h4">Filters</h2>
+          <p className="text-xs uppercase text-tertiary no-bottom-margin">Category</p>
+          <nav className="navbar navbar-vertical" aria-label="Category filter">
             <ul>
               <li className={category ? '' : 'active'}>
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    updateParams({ category: undefined });
-                  }}
-                >
+                <Link to={{ search: paramsWith({ category: undefined }).toString() }}>
                   All categories
-                </a>
+                </Link>
               </li>
               {categories.data?.map((c) => (
                 <li key={c} className={category === c ? 'active' : ''}>
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      updateParams({ category: c });
-                    }}
-                  >
-                    {c}
-                  </a>
+                  <Link to={{ search: paramsWith({ category: c }).toString() }}>{c}</Link>
                 </li>
               ))}
             </ul>
@@ -74,14 +68,18 @@ export default function ProductListingPage() {
         </aside>
 
         <div className="unit-75 tablet-unit-100">
-          <div className="listing-toolbar">
-            <p>{listing.isLoading ? 'Loading…' : `${total} results`}</p>
-            <form className="form">
+          <div className="display-flex justify-between items-center margin-bottom-sm">
+            <p className="text-secondary no-margin">
+              {listing.isLoading ? 'Loading…' : `${total} results`}
+            </p>
+            <form className="form-inline">
               <label>
-                Sort by
+                Sort by{' '}
                 <select
                   value={sort ?? ''}
-                  onChange={(e) => updateParams({ sort: e.target.value || undefined })}
+                  onChange={(e) =>
+                    setSearchParams(paramsWith({ sort: e.target.value || undefined }))
+                  }
                 >
                   {SORT_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -95,32 +93,51 @@ export default function ProductListingPage() {
 
           {listing.isError && <p>Couldn&rsquo;t load products.</p>}
 
-          <div className="units-row product-grid">
+          <div className="units-row">
             {listing.data?.products.map((product) => (
               <div key={product.id} className="unit-33 tablet-unit-50 phone-unit-100">
-                <ProductCard product={product} />
+                <ProductCard product={product} showMeta />
               </div>
             ))}
           </div>
 
-          <nav className="pagination" aria-label="Pagination">
-            <button
-              type="button"
-              className="btn btn-sm"
-              disabled={page <= 1}
-              onClick={() => updateParams({ page: String(page - 1) })}
-            >
-              ‹ Prev
-            </button>
-            <span>Page {page}</span>
-            <button
-              type="button"
-              className="btn btn-sm"
-              disabled={!hasNextPage}
-              onClick={() => updateParams({ page: String(page + 1) })}
-            >
-              Next ›
-            </button>
+          <nav aria-label="Pagination">
+            <ul className="pagination justify-center margin-top-lg">
+              <li className={page <= 1 ? 'disabled' : ''}>
+                {page <= 1 ? (
+                  <span aria-hidden="true">‹</span>
+                ) : (
+                  <Link
+                    to={{ search: paramsWith({ page: String(page - 1) }).toString() }}
+                    aria-label="Previous page"
+                  >
+                    ‹
+                  </Link>
+                )}
+              </li>
+              {pageWindow(page, pageCount).map((p) => (
+                <li key={p} className={p === page ? 'active' : ''}>
+                  <Link
+                    to={{ search: paramsWith({ page: String(p) }).toString() }}
+                    aria-current={p === page ? 'page' : undefined}
+                  >
+                    {p}
+                  </Link>
+                </li>
+              ))}
+              <li className={page >= pageCount ? 'disabled' : ''}>
+                {page >= pageCount ? (
+                  <span aria-hidden="true">›</span>
+                ) : (
+                  <Link
+                    to={{ search: paramsWith({ page: String(page + 1) }).toString() }}
+                    aria-label="Next page"
+                  >
+                    ›
+                  </Link>
+                )}
+              </li>
+            </ul>
           </nav>
         </div>
       </div>

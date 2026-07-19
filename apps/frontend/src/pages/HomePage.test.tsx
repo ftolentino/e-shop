@@ -58,7 +58,7 @@ describe('HomePage', () => {
 
   it('renders the hero and fetched products', async () => {
     renderHomePage();
-    expect(screen.getByRole('heading', { name: /shop everything/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /summer sale/i })).toBeInTheDocument();
     expect(await screen.findByText('Featured Thing')).toBeInTheDocument();
     expect(await screen.findByText('New Thing')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'gadgets' })).toBeInTheDocument();

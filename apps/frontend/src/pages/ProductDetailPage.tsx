@@ -34,16 +34,32 @@ export default function ProductDetailPage() {
   const inStock = product.stock > 0;
 
   return (
-    <main className="units-container product-detail">
+    <main className="units-container">
+      <div className="breadcrumbs">
+        <ul>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to={`/products?category=${encodeURIComponent(product.category)}`}>
+              {product.category}
+            </Link>
+          </li>
+          <li className="active">
+            <span>{product.title}</span>
+          </li>
+        </ul>
+      </div>
+
       <div className="units-row">
-        <div className="unit-40 phone-unit-100 gallery">
+        <div className="unit-40 phone-unit-100">
           <img
             className="gallery-main"
             src={images[activeImage] ?? product.thumbnail}
             alt={product.title}
           />
           {images.length > 1 && (
-            <div className="gallery-thumbs">
+            <div className="display-flex gap-sm margin-top-sm">
               {images.map((image, index) => (
                 <button
                   key={image}
@@ -59,37 +75,44 @@ export default function ProductDetailPage() {
           )}
         </div>
 
-        <div className="unit-60 phone-unit-100 buy-box">
-          <h1>{product.title}</h1>
-          <p className="buy-box-meta">
+        <div className="unit-60 phone-unit-100">
+          <h1 className="no-top-margin">{product.title}</h1>
+          <p className="text-secondary no-top-margin">
             ★ {product.rating.toFixed(1)}
             {product.brand ? ` · ${product.brand}` : ''}
           </p>
-          <p className="buy-box-price">${product.price.toFixed(2)}</p>
+          <p className="text-2xl font-bold color-accent">${product.price.toFixed(2)}</p>
           <p>{product.description}</p>
 
-          <div className="qty-stepper">
-            <button
-              type="button"
-              className="btn btn-sm"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              aria-label="Decrease quantity"
-            >
-              −
-            </button>
-            <span>{quantity}</span>
-            <button
-              type="button"
-              className="btn btn-sm"
-              onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
-              aria-label="Increase quantity"
-              disabled={quantity >= product.stock}
-            >
-              +
-            </button>
+          <hr />
+
+          <div className="display-flex items-center gap-sm margin-bottom">
+            <span className="text-xs uppercase text-tertiary">Qty</span>
+            <div className="btn-group joined" role="group" aria-label="Quantity">
+              <button
+                type="button"
+                className="btn btn-sm"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                aria-label="Decrease quantity"
+              >
+                −
+              </button>
+              <span className="btn btn-sm cursor-default" aria-live="polite">
+                {quantity}
+              </span>
+              <button
+                type="button"
+                className="btn btn-sm"
+                onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                aria-label="Increase quantity"
+                disabled={quantity >= product.stock}
+              >
+                +
+              </button>
+            </div>
           </div>
 
-          <div>
+          <div className="margin-bottom-sm">
             <button
               type="button"
               className="btn btn-primary btn-lg"
@@ -110,16 +133,16 @@ export default function ProductDetailPage() {
             </button>
           </div>
 
-          <p className="stock-note">
+          <p className="text-tertiary text-sm">
             {inStock ? `✓ in stock (${product.stock}) · free shipping` : 'Currently unavailable'}
           </p>
         </div>
       </div>
 
       {related.data && related.data.length > 0 && (
-        <section className="related-products">
+        <section className="margin-top-xl">
           <h2>You may also like</h2>
-          <div className="units-row product-grid">
+          <div className="units-row">
             {related.data.map((item) => (
               <div key={item.id} className="unit-25 tablet-unit-50 phone-unit-100">
                 <ProductCard product={item} />
