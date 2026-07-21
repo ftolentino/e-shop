@@ -1,4 +1,6 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "buildCommand": "pnpm --filter @e-shop/frontend build",
   "outputDirectory": "apps/frontend/dist",
   "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]

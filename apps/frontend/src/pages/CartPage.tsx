@@ -23,14 +23,21 @@ export default function CartPage() {
     <main className="units-container">
       <h1>Your cart</h1>
       <div className="units-row">
-        <div className="unit-70 tablet-unit-100 cart-items">
+        <div className="unit-70 tablet-unit-100">
           {items.map((item) => (
-            <div className="cart-line" key={item.productId}>
+            <div
+              className="border border-radius bg-surface padding-sm display-flex items-center gap margin-bottom-sm"
+              key={item.productId}
+            >
               <img className="cart-line-thumb" src={item.thumbnail} alt={item.title} />
               <div className="cart-line-info">
-                <p>{item.title}</p>
+                <p className="font-medium no-margin">{item.title}</p>
               </div>
-              <div className="qty-stepper">
+              <div
+                className="btn-group joined"
+                role="group"
+                aria-label={`Quantity of ${item.title}`}
+              >
                 <button
                   type="button"
                   className="btn btn-sm"
@@ -39,7 +46,9 @@ export default function CartPage() {
                 >
                   −
                 </button>
-                <span>{item.quantity}</span>
+                <span className="btn btn-sm cursor-default" aria-live="polite">
+                  {item.quantity}
+                </span>
                 <button
                   type="button"
                   className="btn btn-sm"
@@ -49,10 +58,12 @@ export default function CartPage() {
                   +
                 </button>
               </div>
-              <p className="cart-line-total">${(item.price * item.quantity).toFixed(2)}</p>
+              <p className="cart-line-total font-bold no-margin">
+                ${(item.price * item.quantity).toFixed(2)}
+              </p>
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost btn-sm btn-icon"
                 aria-label={`Remove ${item.title} from cart`}
                 onClick={() => remove(item.productId)}
               >
@@ -62,19 +73,26 @@ export default function CartPage() {
           ))}
         </div>
 
-        <aside className="unit-30 tablet-unit-100 cart-summary">
-          <h2>Summary</h2>
-          <div className="cart-summary-row">
-            <span>Subtotal</span>
-            <strong>${subtotal.toFixed(2)}</strong>
+        <aside className="unit-30 tablet-unit-100">
+          <div className="border border-radius bg-surface padding">
+            <h2 className="h4 no-top-margin">Summary</h2>
+            <div className="display-flex justify-between margin-bottom-sm">
+              <span className="text-secondary">Subtotal</span>
+              <span>${subtotal.toFixed(2)}</span>
+            </div>
+            <div className="display-flex justify-between margin-bottom-sm">
+              <span className="text-secondary">Shipping</span>
+              <span>Free</span>
+            </div>
+            <hr />
+            <div className="display-flex justify-between margin-bottom">
+              <span className="font-semibold">Total</span>
+              <strong className="color-accent">${subtotal.toFixed(2)}</strong>
+            </div>
+            <button type="button" className="btn btn-primary width-100" disabled>
+              Checkout (coming soon)
+            </button>
           </div>
-          <div className="cart-summary-row">
-            <span>Shipping</span>
-            <span>Free</span>
-          </div>
-          <button type="button" className="btn btn-primary btn-lg" disabled>
-            Checkout (coming soon)
-          </button>
         </aside>
       </div>
     </main>

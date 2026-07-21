@@ -3,16 +3,25 @@ import type { CatalogProduct } from '../lib/catalog';
 
 interface ProductCardProps {
   product: CatalogProduct;
+  /** Show the "★ rating · category" line (used on the listing grid). */
+  showMeta?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, showMeta = false }: ProductCardProps) {
   return (
-    <article className="product-card">
+    <article className="product-card border border-radius bg-surface no-link-style">
       <Link to={`/products/${product.id}`} className="product-card-link">
         <img src={product.thumbnail} alt={product.title} className="product-card-image" />
-        <h3 className="product-card-title">{product.title}</h3>
+        <div className="padding-sm">
+          <h3 className="product-card-title text-sm font-medium no-margin">{product.title}</h3>
+          <p className="color-accent font-bold no-margin">${product.price.toFixed(2)}</p>
+          {showMeta && (
+            <p className="text-tertiary text-xs no-margin">
+              ★ {product.rating.toFixed(1)} · {product.category}
+            </p>
+          )}
+        </div>
       </Link>
-      <p className="product-card-price">${product.price.toFixed(2)}</p>
     </article>
   );
 }

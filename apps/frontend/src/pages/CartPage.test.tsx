@@ -29,7 +29,7 @@ describe('CartPage', () => {
     renderCartPage();
 
     expect(screen.getByText('Widget')).toBeInTheDocument();
-    expect(screen.getAllByText('$20.00')).toHaveLength(2); // line total + summary subtotal
+    expect(screen.getAllByText('$20.00')).toHaveLength(3); // line total + summary subtotal + total
 
     fireEvent.click(screen.getByRole('button', { name: /increase quantity/i }));
     expect(useCartStore.getState().items[0]?.quantity).toBe(3);
